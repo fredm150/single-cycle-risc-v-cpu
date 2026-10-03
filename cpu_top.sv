@@ -20,6 +20,7 @@ module cpu_top (
         .opcode     (instr[6:0]),
         .funct3     (instr[14:12]),
         .funct7_5   (instr[30]),
+        .funct7_0   (instr[25]),
         .branch_taken  (branch_taken),
         .res_src    (res_src),
         .jalr       (jalr),
