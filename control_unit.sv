@@ -2,6 +2,7 @@ module control_unit (
     input  logic [6:0] opcode,
     input  logic [2:0] funct3,
     input  logic       funct7_5,
+    input  logic       funct7_0,
     input  logic       branch_taken,
     output logic [2:0] res_src,
     output logic       mem_wr,
@@ -32,6 +33,7 @@ module control_unit (
     alu_decoder ad (
         .funct3(funct3),
         .funct7_5(funct7_5),
+        .funct7_0(funct7_0),
         .op_b5(opcode[5]),
         .ALU_op(ALU_op), 
         .alu_control(alu_control)
@@ -134,7 +136,7 @@ module main_decoder (
             jal: begin
                 reg_wr  = 1'b1;     // write the link register
                 res_src = 3'b10;    // writeback = PC+4
-                imm_src = 3'b111;   // J-type immediate
+                imm_src = 3'b011;   // J-type immediate
                 jump    = 1'b1;     // unconditional jump
             end
 
@@ -181,6 +183,7 @@ endmodule
 module alu_decoder (
     input  logic [2:0] funct3,
     input  logic funct7_5,
+    input logic funct7_0,
     input logic op_b5,
     input  logic [1:0] ALU_op,
     output logic [3:0] alu_control
@@ -189,21 +192,36 @@ module alu_decoder (
 
     logic rtype_sub;
     assign rtype_sub = funct7_5 & op_b5;
+    assign is_mul = funct7_0 & op_b5;       // multiply extension
 
     always_comb begin
         alu_control = ALU_ADD;          // default
 
-        casez (ALU_op)
+        case (ALU_op)
             2'b00: alu_control = ALU_ADD;   // loads/stores: address add
             2'b01: alu_control = ALU_SUB;   // branches: subtract for compare
             2'b10: begin                    // R-type
-                casez (funct3)
-                    3'b000: alu_control = rtype_sub ? ALU_SUB : ALU_ADD;
-                    3'b010: alu_control = ALU_SLT;   // now the signed code (4'h6)
-                    3'b110: alu_control = ALU_OR;
-                    3'b111: alu_control = ALU_AND;
-                    default: alu_control = ALU_ADD;
-                endcase
+                if (is_mul) begin
+                    case (funct3)
+                        3'b000: alu_control = ALU_MUL;
+                        3'b001: alu_control = ALU_MULH;
+                        3'b010: alu_control = ALU_MULHSU;
+                        3'b011: alu_control = ALU_MULHU;
+                        default: alu_control = ALU_ADD;
+                    endcase
+                end else begin
+                    case (funct3)
+                            3'b000: alu_control = rtype_sub ? ALU_SUB : ALU_ADD;
+                            3'b001: alu_control = ALU_SLL;
+                            3'b010: alu_control = ALU_SLT;
+                            3'b011: alu_control = ALU_SLTU;
+                            3'b100: alu_control = ALU_XOR;
+                            3'b101: alu_control = funct7_5 ? ALU_SRA : ALU_SRL;
+                            3'b110: alu_control = ALU_OR;
+                            3'b111: alu_control = ALU_AND;
+                            default: alu_control = ALU_ADD;
+                    endcase
+                end
             end
             default: alu_control = ALU_ADD;
         endcase
