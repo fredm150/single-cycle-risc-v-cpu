@@ -10,5 +10,11 @@ package alu_ops_pkg;
     ALU_SLT  = 4'h6,
     ALU_SLL  = 4'h7,
     ALU_SRL  = 4'h8,
-    ALU_SRA  = 4'h9;
+    ALU_SRA  = 4'h9,
+
+  // multiply extension opcodes
+    ALU_MUL    = 4'hA,
+    ALU_MULH   = 4'hB,
+    ALU_MULHSU = 4'hC,
+    ALU_MULHU  = 4'hD;
 endpackage
