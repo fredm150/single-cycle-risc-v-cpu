@@ -7,8 +7,20 @@ module alu #(parameter DATA_WIDTH = 32)
              input  logic [3:0] alu_control,
              output logic Zero,
              output logic [DATA_WIDTH-1:0] alu_result);
+
     import alu_ops_pkg::*;
 
+
+    // M-extension: full 64-bit products
+    logic signed [63:0] product_signed_signed;     // signed   x signed
+    logic        [63:0] product_unsigned_unsigned; // unsigned x unsigned
+    logic signed [63:0] product_signed_unsigned;   // signed   x unsigned (for mulhsu)
+
+    assign product_signed_signed   = $signed(A) * $signed(B);
+    assign product_unsigned_unsigned = A * B;
+    assign product_signed_unsigned   = $signed(A) * $signed({1'b0, B});
+
+    
     always_comb begin
         case (alu_control)
             ALU_ADD:  alu_result = A + B;
@@ -21,6 +33,10 @@ module alu #(parameter DATA_WIDTH = 32)
             ALU_SLL:  alu_result = A << B[4:0];
             ALU_SRL:  alu_result = A >> B[4:0];
             ALU_SRA:  alu_result = $signed(A) >>> B[4:0];
+            ALU_MUL:  alu_result = product_signed_signed[31:0];     // low 32 — signedness irrelevant here
+            ALU_MULH: alu_result = product_signed_signed[63:32];
+            ALU_MULHSU: alu_result = product_signed_unsigned[63:32];
+            ALU_MULHU: alu_result = product_unsigned_unsigned[63:32];
             default:  alu_result = '0;
         endcase
     end
