@@ -1,9 +1,9 @@
 module instr_memory (
     input  logic [31:0] addr,   
-    output logic [31:0] inst);
+    output logic [31:0] instr);
 
     // internal memory array (64 words each 32 bits)
-    logic [31:0] RAM[63:0];
+    logic [31:0] RAM[0:63];
 
     // load test program into internal ram
     initial
@@ -14,4 +14,3 @@ module instr_memory (
     assign instr = RAM[addr[31:2]];
 
 endmodule
-
