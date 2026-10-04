@@ -7,7 +7,8 @@ module cpu_top (
     logic [31:0] alu_result, wr_data;
     logic        mem_wr, pc_src, alu_src, reg_wr, branch_taken;
     logic [2:0]  res_src, imm_src;
-    logic [2:0]  alu_control;
+    logic [3:0]  alu_control;
+    logic jalr;
 
     // instantiate instruction memory
     instr_memory imem (
@@ -52,11 +53,11 @@ module cpu_top (
     );
 
     // instantiate data memory
-    data_mem dmem (
+    dmem dmem (
         .clk        (clk),
-        .mem_write  (mem_wr),
+        .mem_wr  (mem_wr),
         .addr       (alu_result),
-        .write_data (wr_data),
+        .wr_data (wr_data),
         .read_data  (rd_data)
     );
 
