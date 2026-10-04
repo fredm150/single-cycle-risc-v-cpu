@@ -25,7 +25,7 @@ module control_unit (
         .res_src(res_src), 
         .branch(branch),
         .imm_src(imm_src), 
-        .ALU_op(ALU_op)
+        .ALU_op(ALU_op),
         .jump(jump),
         .jalr(jalr)
     );
@@ -191,6 +191,7 @@ module alu_decoder (
     import alu_ops_pkg::*;
 
     logic rtype_sub;
+    logic is_mul;
     assign rtype_sub = funct7_5 & op_b5;
     assign is_mul = funct7_0 & op_b5;       // multiply extension
 
