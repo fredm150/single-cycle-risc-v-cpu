@@ -2,3 +2,7 @@ obj_dir
 visualization
 *.vvp
 *.vcd
+testbench_template.sv
+program.s
+program.txt
+alu_tb2.sv
