@@ -1,4 +1,4 @@
-# RV32I RISC-V CPU — Single-Cycle SystemVerilog Implementation
+## Single-Cycle RISC-V CPU 
 
 A fully functional single-cycle RISC-V CPU implementing the complete **RV32I base integer ISA (37 instructions)** and the **RV32M multiply extension (4 instructions)**, written in SystemVerilog. 
 
